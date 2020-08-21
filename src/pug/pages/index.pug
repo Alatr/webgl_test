@@ -1,0 +1,70 @@
+
+extends ../layout/main
+block variable
+	-
+		var title_page = 'webgl test'
+		var id_page = 'flat-page'
+		var class_page = 'flat-page'
+		var breadcrumbsBtn = 'filter'
+		var breadcrumbsSubitem = [
+			{
+				label: 'About',
+				link: pagesLink[0].about
+			}
+		]
+	
+block meta
+	title= title_page
+	meta(name='description', content='')
+block head
+		link(rel='stylesheet', href="./assets/styles/main.min.css")
+block scripts
+	script(defer src='./assets/scripts/index.js')
+block content
+	#container
+block footer
+	include ../includes/footer.pug
+	// vertext shader
+
+	script#vertexShader(type="x-shader/x-vertex").
+			varying vec2 vUv;
+			uniform vec2 u_size;
+			uniform vec2 u_resolution;
+
+			void main() {
+				vUv = (position.xy+1.0)*0.3;
+				float scalex,scaley;
+				scalex = u_size.x/(u_resolution.x);
+				scaley = u_size.y/(u_resolution.y);
+				vUv.x = vUv.x/scalex;
+				vUv.y = vUv.y/scaley;
+				gl_Position =  vec4(position, 1.0);
+			}
+	// fragment shader
+	script#fragmentShader(type="x-shader/x-fragment").
+	
+	
+	
+			varying vec2 vUv;
+			uniform vec2 u_resolution;
+			uniform vec2 u_mouse;
+			uniform float u_time;
+			uniform sampler2D u_texture;
+			//- uniform sampler2D map;
+			//- uniform float u_animation;
+			// Язык шейдеров содержит функцию main, которая возвращает цвет по окончании работы.
+			void main() {
+				// Конечный цвет пикселя записывается в зарезервированную переменную gl_FragColor
+				//- gl_FragColor = vec4(vec3(0.0,0.0, 52.7),1.0);
+				//- gl_FragColor = vec4(vec3(0.0,0.0,abs(cos(u_time*0.5))),1.0);
+				//- vec2 st = gl_FragCoord.xy/u_resolution;
+				gl_FragColor = vec4(texture2D(u_texture, vUv).r,texture2D(u_texture, vUv).r,texture2D(u_texture, vUv).r,1.0);
+
+				//- vec4 color = vec4(texture2D(u_texture, vUv))
+
+				//- gl_FragColor = vec4(0.0,0.0,1.0,1.0);
+
+				//- gl_FragColor = color;
+			}
+
+block header
