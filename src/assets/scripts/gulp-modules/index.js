@@ -13,7 +13,6 @@ var mouse = {
 var loader = new THREE.TextureLoader();
 document.onmousemove = getMouseXY;
 	var MyTexture = new THREE.TextureLoader().load('/assets/images/foto.jpg', function(){
-console.log(MyTexture);
 		init();
 		animate();
 	});
@@ -47,9 +46,15 @@ function init() {
 		u_texture: {
 			value: MyTexture,
 		},
-		// map: {
-		// 	value: loader.load("img/popkamap.jpg")
-		// }
+		u_map: {
+			value: loader.load("/assets/images/123.jpg")
+		},
+		u_sky: {
+			value: loader.load("/assets/images/sky.jpg")
+		},
+		u_weed: {
+			value: loader.load("/assets/images/weed.jpg")
+		},
 	};
 	var material = new THREE.ShaderMaterial({
 		uniforms: uniforms,

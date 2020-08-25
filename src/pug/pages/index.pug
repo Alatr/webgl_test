@@ -41,6 +41,33 @@ block footer
 				gl_Position =  vec4(position, 1.0);
 			}
 	// fragment shader
+	//- script#fragmentShader(type="x-shader/x-fragment").
+			
+	
+	//- 	uniform vec2 u_resolution;
+	//- 	uniform vec2 u_mouse;
+	//- 	uniform float u_time;
+
+	//- 	// Plot a line on Y using a value between 0.0-1.0
+	//- 		float plot(vec2 st, float pct){
+	//- 			return  smoothstep( pct-0.001, pct, st.y) -
+	//- 							smoothstep( pct, pct+0.001, st.y);
+	//- 		}
+
+	//- 	void main() {
+	//- 		vec2 st = gl_FragCoord.xy/u_resolution;
+
+	//- 			float y = pow(st.x,10.0);
+	//- 			//- float y = st.x;
+
+	//- 			vec3 color = vec3(y);
+
+	//- 			// Plot a line
+	//- 			float pct = plot(st, y);
+	//- 			color = (1.0-pct)*color+pct*vec3(0.0,1.0,0.0);
+
+	//- 		gl_FragColor = vec4(color,1.0);
+	//- 	}
 	script#fragmentShader(type="x-shader/x-fragment").
 	
 	
@@ -50,21 +77,35 @@ block footer
 			uniform vec2 u_mouse;
 			uniform float u_time;
 			uniform sampler2D u_texture;
-			//- uniform sampler2D map;
+			uniform sampler2D u_map;
+			uniform sampler2D u_sky;
+			uniform sampler2D u_weed;
 			//- uniform float u_animation;
 			// Язык шейдеров содержит функцию main, которая возвращает цвет по окончании работы.
 			void main() {
 				// Конечный цвет пикселя записывается в зарезервированную переменную gl_FragColor
-				//- gl_FragColor = vec4(vec3(0.0,0.0, 52.7),1.0);
 				//- gl_FragColor = vec4(vec3(0.0,0.0,abs(cos(u_time*0.5))),1.0);
 				//- vec2 st = gl_FragCoord.xy/u_resolution;
-				gl_FragColor = vec4(texture2D(u_texture, vUv).r,texture2D(u_texture, vUv).r,texture2D(u_texture, vUv).r,1.0);
+						//- gl_FragColor = vec4(st.x,st.y,0.0,1.0);
 
-				//- vec4 color = vec4(texture2D(u_texture, vUv))
+				float m = (u_mouse.x / u_resolution.x - 0.8) * 0.003;
+				float mSky = (u_mouse.x / u_resolution.x - 1.0) * -0.005;
+				float mWeed = (u_mouse.x / u_resolution.x - 1.0) * -0.001;
+				float mWeedY = (u_mouse.y / u_resolution.y - 1.0) * -0.001;
 
-				//- gl_FragColor = vec4(0.0,0.0,1.0,1.0);
 
-				//- gl_FragColor = color;
+				float distort = sin(vUv.y*100.0 + u_time)*0.003 + m;
+				float distortX = sin(vUv.x*100.0 + u_time)*0.003 + mSky;
+				float distortWeed = sin(vUv.y*5.0 + u_time)*0.003 + mWeed;
+
+				
+				float map  = vec4(texture2D(u_map, vUv)).r;
+				float sky  = vec4(texture2D(u_sky, vUv)).r;
+				float weed  = vec4(texture2D(u_weed, vUv)).r;
+
+
+				vec4 foto = vec4(texture2D(u_texture, vec2(vUv.x + distortWeed*weed + distortX*sky + distort*map, vUv.y + weed*mWeedY)));
+				gl_FragColor = vec4(foto.rgb, 1.0);
 			}
 
 block header
