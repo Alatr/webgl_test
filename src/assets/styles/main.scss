@@ -1,19 +1,4 @@
-@function calc_top($value1, $value2) {
-  @return $value1 * $value2;
-}
 
-
-
-$cnt: 34;
-
-@for $i from 1 through 150 {
-
-	.option:nth-child(#{$i}):hover ~ .option-bg {
-		top: $cnt * $i - 34px;
-		background-color: #417BBF;
-		border-radius: 4 4px 0 0;
-	}
-}
 @import './assets/vars';  // переменные
 @import './assets/smart-grid';  // mixins smartgrid.js
 // libraries
@@ -34,3 +19,15 @@ $cnt: 34;
 @import './404';
 @import './loader';
 
+
+
+.parent {
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}
+canvas{
+	width: 100%;
+	height: 100%;
+	display: flex;
+}
