@@ -9,10 +9,15 @@ void main() {
 `;
 
  const fragment = `
+ # define PI 3.14159265359
+ 
+ 
+ 
 	varying vec2 vUv;
 	uniform vec2 u_resolution;
 	uniform vec2 u_mouse;
 	uniform float u_time;
+	uniform float u_animation;
 	uniform sampler2D u_texture;
 	uniform sampler2D u_map;
 	uniform sampler2D u_sky;
@@ -24,51 +29,131 @@ void main() {
 	float rand(vec2 seed) {
 		return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453123);
 	}
+
+	float noise( in vec2 st) {
+		vec2 i = floor(st);
+		vec2 f = fract(st);
+
+		// Four corners in 2D of a tile
+		float a = rand(i);
+		float b = rand(i + vec2(1.0, 0.0));
+		float c = rand(i + vec2(0.0, 1.0));
+		float d = rand(i + vec2(1.0, 1.0));
+
+		vec2 u = f * f * (3.0 - 2.0 * f);
+
+		return mix(a, b, u.x) +
+			(c - a) * u.y * (1.0 - u.x) +
+			(d - b) * u.x * u.y;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	void main() {
 		
 		vec2 uv = 0.5 * gl_FragCoord.xy / (res.xy);
 		vec2 myUV = (uv - vec2(0.5)) * res.zw + vec2(0.5);
+
+
+		// ******* mASK
 		
-  	vec4 disp = texture2D(disp, myUV);
-  	vec2 dispVec = vec2(disp.r, disp.g);
+  	// vec4 disp = texture2D(disp, myUV);
+  	// vec2 dispVec = vec2(disp.r, disp.g);
 			
 				
-					float m = (u_mouse.x / u_resolution.x - 0.1) * 0.05;
-					float mSky = (u_mouse.x / u_resolution.x - 1.0) * -0.005;
-					float mWeed = (u_mouse.x / u_resolution.x - 1.0) * -0.001;
-					float mWeedY = (u_mouse.y / u_resolution.y - 1.0) * -0.001;
+		// 			float m = (u_mouse.x / u_resolution.x - 0.1) * 0.05;
+		// 			float mSky = (u_mouse.x / u_resolution.x - 1.0) * -0.005;
+		// 			float mWeed = (u_mouse.x / u_resolution.x - 1.0) * -0.001;
+		// 			float mWeedY = (u_mouse.y / u_resolution.y - 1.0) * -0.001;
 
 
-		 			float distort = sin(myUV.y * 10.0 + u_time) * 0.003 + m;
-		 			float distortX = sin(myUV.x*100.0 + u_time)*0.003 + mSky;
-		 			float distortWeed = sin(myUV.y*5.0 + u_time)*0.003 + mWeed;
+		//  			float distort = sin(myUV.y * 10.0 + u_time) * 0.3 + m;
+		//  			float distortX = sin(myUV.x*100.0 + u_time)*0.003 + mSky;
+		//  			float distortWeed = sin(myUV.y*5.0 + u_time)*0.003 + mWeed;
 
 
-					float map  = vec4(texture2D(u_map, myUV)).r;
-					float sky  = vec4(texture2D(u_sky, myUV)).r;
-					float weed  = vec4(texture2D(u_weed, myUV)).r;
+		// 			float map  = vec4(texture2D(u_map, myUV)).r;
+		// 			float sky  = vec4(texture2D(u_sky, myUV)).r;
+		// 			float weed  = vec4(texture2D(u_weed, myUV)).r;
 
 
-					vec4 foto = vec4(texture2D(u_texture, vec2(
-																									myUV.x +
-																										//  distortWeed * weed +
-																										//  distortX * sky +
-																										 distort * map * disp.r,
-																									myUV.y +
-																										 weed * mWeedY
+		// 			vec4 foto = vec4(texture2D(u_texture, vec2(
+		// 																							myUV.x +
+		// 																								 distortWeed * weed +
+		// 																								 distortX * sky +
+		// 																								 distort * map * disp.r,
+		// 																							myUV.y +
+		// 																								 weed * mWeedY
 
-																										 )));
-					gl_FragColor = vec4(foto.rgb, 1.0);
+		// 																								 )));
+		// 			gl_FragColor = vec4(foto.rgb, 1.0);
+
+		
+		// * transition animate
+		
+		// vec4 disp = texture2D(disp, myUV);
+		// vec2 dispVec = vec2(disp.r, disp.g);
+		
+		// vec4 foto = vec4(texture2D(u_texture, myUV * (1.0 - dispVec * u_animation)));
+		// gl_FragColor = vec4(foto.rgb, 1.0);
+		
+		// * transition animate
+
+		vec2 st = gl_FragCoord.xy / u_resolution.xy;
+
+		float scale = 1.0;
+		float offset = 0.05;
+
+		// float angle = noise(st + (u_time * 0.005)+( (u_mouse * 0.5) * 2.4) * 0.3);
+		float angle = noise(st + u_time * 0.01) * 8.0;
+		float radius = offset;
+
+		st *= scale;
+		st += radius * vec2(cos(angle  + u_mouse.x * 0.001), sin(angle  + u_mouse.y * 0.001));
+		
+
+		vec2 positionMouse = (u_mouse / u_resolution - 0.5) * 0.07;
+
+
+		 vec4 color = texture2D(u_texture, st + 0.1 + positionMouse);
+
+		 gl_FragColor = color;
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
  `;
 
 
 
-const imageUrl = '/assets/images/foto.jpg';
-const dispImage = '/assets/images/12.jpg';
+const imageUrl = '/assets/images/qw.jpg';
+const dispImage = '/assets/images/10.jpg';
 const parent = document.querySelector('.parent');
-let renderer, scene, camera, uniforms, object, a1, a2;
+let renderer, scene, camera, uniforms, object, a1, a2, mat;
 const imagesRatio = parent.offsetHeight / parent.offsetWidth;
 let mouse = {
 	 x: 0,
@@ -161,7 +246,7 @@ function initWebGL(){
 	};
 	/*  */
 	/* matireal shaders */
-	const mat = new THREE.ShaderMaterial({
+	mat = new THREE.ShaderMaterial({
 		uniforms,
 		vertexShader: vertex,
 		fragmentShader: fragment,
@@ -235,6 +320,31 @@ function getMouseXY(e) {
 	uniforms.u_mouse.value.x = mouse.x;
 	uniforms.u_mouse.value.y = mouse.y;
 }
+
+
+ parent.addEventListener('mouseenter', transitionIn);
+ parent.addEventListener('touchstart', transitionIn);
+ parent.addEventListener('mouseleave', transitionOut);
+ parent.addEventListener('touchend', transitionOut);
+
+  function transitionIn() {
+		console.log(2);
+  	TweenMax.to(mat.uniforms.u_animation, 1, {
+  		value: 1,
+  		onUpdate: render,
+  		onComplete: render,
+  	});
+	}
+	
+	function transitionOut() {
+		TweenMax.to(mat.uniforms.u_animation, 1, {
+			value: 0,
+			onUpdate: render,
+			onComplete: render,
+		});
+	}
+
+
 /*  */
 /*
 * initWebGL function end
